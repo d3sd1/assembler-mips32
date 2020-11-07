@@ -27,12 +27,12 @@ bucle1: bge $t0, $a1, fin1	#Cuando i >= M, ir a fin_1
         li $t1, 0	# j = $t1 (iniciado a 0)
 bucle2: bge $t1, $a2, fin2	#Cuando j >= N, ir a fin_2 		
 			# Dirección del elemento (i,j)
-			mul  $t3 $t0 $a2 # i*N <- $t3
-            add  $t3 $t3 $t1 # + j
-            mul  $t3 $t3 4   # * 4
-            add  $t3 $a0 $t3 # A + (i*N + j)*4
+			mul  $t2 $t0 $a2 # i*N <- $t3
+            add  $t2 $t2 $t1 # + j
+            mul  $t2 $t3 4   # * 4
+            add  $t2 $a0 $t2 # A + (i*N + j)*4
             # A[i][j] = 0
-            sw $zero, ($t3) # memoria[$t3] = 0			
+            sw $zero, ($t2) # memoria[$t2] = 0			
  		addi $t1 $t1, 1	#j++
  		b bucle2
   fin2:
@@ -53,10 +53,17 @@ bucle2: bge $t1, $a2, fin2	#Cuando j >= N, ir a fin_2
     		addu $sp, $sp, 12
  			jr $ra	#Return
 
-   main:
-    	jal init
 #add(int A[][], int M, int N, int i, int j, int k, int l)
 # A -> Matriz MxN.
 # M -> Número de filas.
 # N -> Número de columnas.
 #Suma los valores de la matriz comprendidos entre los elementos (i,j) y (k,l)
+# i -> entero correspondiente a la fila del primer elemento de la matriz
+# j -> entero correspondiente a la columna del primer elemento de la matriz
+# k -> entero correspondiente a la fila del último elemento de la matriz 
+# l ->  entero correspondiente a la columna del último elemento de la matriz
+
+
+   main:
+    	jal init
+        
