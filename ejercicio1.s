@@ -82,7 +82,7 @@ bucle2: bge $t1, $a2, fin2	#Cuando j >= N, ir a fin_2
         lw $t1, 4($sp)
         lw $t2, 8($sp)
         lw $t3, 12($sp)
-   		lw $a1, 16($sp) 	
+   	lw $a1, 16($sp) 	
       	lw $a2, 20($sp)
         addu $sp, $sp, 12
         
