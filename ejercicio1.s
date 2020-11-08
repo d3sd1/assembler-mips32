@@ -89,7 +89,7 @@ bucle4: bge $t1, $a2, fin4	#Si j >= N ir a fin4
   	li $t1, 0
         addi $t0, $t0, 1 #i++
         b bucle3
-  fin5: bgt $t2, $t3, fin3	# Si j > l ir a fin3 
+  fin5: bgt $t1, $t3, fin3	# Si j > l ir a fin3 
   	add $t6, $t6, $t4
         addi $t1 $t1, 1	#j++
   fin3:
@@ -102,7 +102,7 @@ bucle4: bge $t1, $a2, fin4	#Si j >= N ir a fin4
       	lw $a2, 20($sp)
         addu $sp, $sp, 20
         jr $ra
-        
+
 prueba:	#Comprobamos que los valores no estén fuera de rango, redirigiendo a fin_error
 	bgt $t0, $a1, fin_error	#Si i > M 
 	bgt $t1, $a2, fin_error	#Si j > N 
@@ -113,6 +113,75 @@ prueba:	#Comprobamos que los valores no estén fuera de rango, redirigiendo a fi
 	blt $t2, $a1, fin_error	#Si k < M  
 	blt $t3, $a2, fin_error	#Si l < N 
 	blt $t2, $t0, fin_error	#Si k < i 
+	
+#compare(int A[][], int B[][], int M, int N, int i, int j, int k, int l)
+# A -> Matriz MxN.
+# B -> Matriz MxN.
+# M -> Número de filas.
+# N -> Número de columnas.
+#Suma los valores de la matriz comprendidos entre los elementos (i,j) y (k,l)
+# i -> entero correspondiente a la fila de de la matriz A
+# j -> entero correspondiente a la columna de de la matriz A
+# k -> entero correspondiente a la fila de la matriz B
+# l ->  entero correspondiente a la columna de la matriz B
+
+compare: 
+    	li $a0, 0 # A <- $a1
+        li $a3, 0 # B <- $a3
+    	addu $sp, $sp, -20
+       	sw $a1, 20($sp) # M <- $a1 
+       	sw $a2, 16($sp) # N <- $a2 
+        mul $a0, $a1, $a2 # A = MxN
+        mul $a3, $a1, $a2 # B = MxN
+        blez $a1, fin_error #Si el número de filas, M, es menor o igual que 0 se redirige a fin_error
+        blez $a2, fin_error #Si el número de columnas, N, es menor o igual que 0 se redirige a fin_error
+        sw $t0, 12($sp) # i <- $t0
+        sw $t1, 8($sp) # j <- $t1
+        sw $t2, 4($sp) # k <- $t2
+        sw $t3, ($sp) # l <- $t3
+        jal prueba #Vemos si los valores se ajustan 
+  
+        # Dirección del elemento A(i,j) <- $t4
+ 	mul  $t4, $t0, $a2 # i*N <- $t4
+        add  $t4, $t4, $t1 # + j
+        mul  $t4, $t4, 4   # * 4
+        add  $t4, $a0, $t4 # A + (i*N + j)*4
+        
+        # Dirección del elemento B(k,l) <- $t5
+ 	mul  $t5, $t2, $a2 # k*N <- $t5
+        add  $t5, $t5, $t3 # + l
+        mul  $t5, $t5, 4   # * 4
+        add  $t5, $a3, $t5 # B + (k*N + l)*4 
+
+		# VAR coincidentes
+        li $s0, 0
+        
+bucle_it_i: bgt $t0, $t2, fin_bucle_it #Si i > k ir a fin_bucle_it
+	    beq $t0, $t2, fin_bucl	#Si i = k ir a fin_bucl
+bucle_it_j: bge $t1, $a2, augment_it_i #Si j >= N ir a augment_it_i
+   bucle_a: beq $t4, $t5, augment_it_j #Si A(i,j) = B(k,l) ir a augment_it_j		
+augment_it_j:            
+	   	 addi $s0, $s0 1	#coincidentes++
+           	 b bucle_a
+augment_it_i: 
+       	     li $t1, 0	#j = 0
+             addi $t0, $t0, 1 #i++
+             b bucle_it_j
+   fin_bucl:
+   	     bgt $t1, $t3, fin3
+             addi $t1 $t1, 1	#j++
+fin_bucle_it:
+   		li $v0 0
+        	lw $t0, ($sp)
+        	lw $t1, 4($sp)
+        	lw $t2, 8($sp)
+        	lw $t3, 12($sp)
+   			lw $a1, 16($sp) 	
+      		lw $a2, 20($sp)
+        	addu $sp, $sp, 20
+          	jr $ra 
+
+
 
 #extract(int A[][], int M, int N, int B[], int P, int i, int j, int k, int l).
 # A -> Matriz MxN.
